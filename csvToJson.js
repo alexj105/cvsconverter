@@ -60,7 +60,7 @@ function guessDelimiters(text, possibleDelimiters) {
   return possibleDelimiters.filter(weedOut);
 
   function weedOut(delimiter) {
-    var cache = -1;
+    let cache = -1;
     return text.split("\n").every(checkLength);
 
     function checkLength(line) {
@@ -68,7 +68,7 @@ function guessDelimiters(text, possibleDelimiters) {
         return true;
       }
 
-      var length = line.split(delimiter).length;
+      let length = line.split(delimiter).length;
       if (cache < 0) {
         cache = length;
       }
