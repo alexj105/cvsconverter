@@ -3,11 +3,10 @@ const fs = require("fs");
 const { Transform } = require("stream");
 const readline = require("readline");
 const { argv } = require("yargs");
-const separator = argv.separator;
+const possibleDelimiters = [",", ";", "\t"];
 
 const readStream = fs.createReadStream(argv.sourceFile);
 
-console.log(argv.sourceFile);
 const rl = readline.createInterface({
   input: readStream,
   crlfDelay: Infinity,
@@ -15,23 +14,23 @@ const rl = readline.createInterface({
 
 // onData
 
-let header = "";
+let headerKeys = [];
+let separator = argv.separator || "";
+
 rl.on("line", function (line, lineno = line_counter()) {
-  console.log(lineno);
   if (lineno === 1) {
-    header += line;
-    console.log(header);
-    fs.appendFileSync(argv.resultFile, '{"result":[', function (err) {
+    separator = guessDelimiters(line, possibleDelimiters);
+    headerKeys = line.toString().split(separator);
+    fs.writeFileSync(argv.resultFile, '{"result":[', function (err) {
       if (err) throw err;
     });
   } else if (lineno === 2) {
-    let jsonItem = JSON.stringify(keyValueMatcher(line, header));
-    console.log(jsonItem.toString());
+    let jsonItem = JSON.stringify(keyValueMatcher(line, headerKeys, separator));
     fs.appendFileSync(argv.resultFile, jsonItem + "\n", function (err) {
       if (err) throw err;
     });
   } else {
-    let jsonItem = JSON.stringify(keyValueMatcher(line, header));
+    let jsonItem = JSON.stringify(keyValueMatcher(line, headerKeys, separator));
     fs.appendFile(argv.resultFile, "," + jsonItem + "\n", function (err) {
       if (err) throw err;
     });
@@ -49,10 +48,32 @@ const line_counter = ((i = 0) => {
 
 const keyValueMatcher = (values, keys, separator) => {
   let valuesArray = values.split(separator);
-  let keysArray = keys.split(separator);
   let resultObj = valuesArray.reduce((acc, item, index) => {
-    acc[keysArray[index]] = item;
+    acc[keys[index]] = item;
     return acc;
   }, {});
+  console.log(resultObj);
   return resultObj;
 };
+
+function guessDelimiters(text, possibleDelimiters) {
+  return possibleDelimiters.filter(weedOut);
+
+  function weedOut(delimiter) {
+    var cache = -1;
+    return text.split("\n").every(checkLength);
+
+    function checkLength(line) {
+      if (!line) {
+        return true;
+      }
+
+      var length = line.split(delimiter).length;
+      if (cache < 0) {
+        cache = length;
+      }
+      debugger;
+      return cache === length && length > 1;
+    }
+  }
+}
