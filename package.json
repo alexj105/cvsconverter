@@ -1,0 +1,32 @@
+{
+  "name": "cvs_converter",
+  "version": "1.0.0",
+  "description": "The best converter in the world",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexj105/streams.git"
+  },
+  "bin": {
+    "csvToJson": "./csvToJson.js",
+    "largeCsvGenerator": "./largeCsvGenerator.js"
+  },
+  "author": "Alexandr Savelyeu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alexj105/streams/issues"
+  },
+  "homepage": "https://github.com/alexj105/streams#readme",
+  "keywords": [
+    "converter",
+    "json",
+    "cvs"
+  ],
+  "dependencies": {
+    "graceful-fs": "^4.2.6",
+    "yargs": "^17.0.1"
+  }
+}
